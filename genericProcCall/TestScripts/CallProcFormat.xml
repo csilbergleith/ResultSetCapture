@@ -1,0 +1,17 @@
+﻿
+<execute schema="dbo" proc="dcc_ShopperDomainListGet_sp" >
+  <parm name="@shopper_id" value="1234567" direction="input" />
+  <parm name="@howmany" value="500" direction="input" />
+  <parm name="@returnall" value="1" direction="input" />
+  <parm name="@showsummary" value="1" direction="input" />
+  <parm name="@showminmax" value="1" direction="input" />
+  <parm name="@showdetails" value="1" direction="input" />
+  <parm name="@includesortboundary" value="0" direction="input" />
+  <parm name="@expirationdays" value="180" direction="input" />
+  <parm name="@sortcolumn" value="N'domainName          '" direction="input" />
+  <parm name="@sortdirection" value="ASC" direction="input" />
+  <parm name="@sortboundarydomainname" value="1" direction="input" />
+  <parm name="@pagingdirection" value="FORWARD" direction="input" />
+  <output target="#summaryActual" />
+  <output target="#detailActual" />
+</execute>

@@ -1,0 +1,6 @@
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\genericProcCall\genericProcCall\bin\Debug\genericProcCall.dacpac
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\genericProcCall\genericProcCall\obj\Debug\genericProcCall.dll
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\genericProcCall\genericProcCall\obj\Debug\genericProcCall.pdb
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\genericProcCall\genericProcCall\bin\Debug\genericProcCall.dll
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\genericProcCall\genericProcCall\bin\Debug\genericProcCall.pdb
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\genericProcCall\genericProcCall\obj\Debug\genericProcCall.sqlprojResolveAssemblyReference.cache
