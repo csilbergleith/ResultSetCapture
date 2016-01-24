@@ -10,6 +10,14 @@ namespace execProcCall.Models
         public List<outTables> tblOut { get; set; }
 
     }
+
+    public class CommandCall
+    {
+        public string Command { get; set; }
+        public string rsTable { get; set; }
+        public string rsColList { get; set; }
+    }
+
     public class ProcParameters
     {
         public string parmName { get; set; }

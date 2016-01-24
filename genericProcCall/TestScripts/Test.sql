@@ -23,14 +23,14 @@ create table #Summary2
  unClearedBalance money
  );
 
-EXEC ResultSetCapture @callXML= '<execute schema="dbo" proc="customerBalanceByLastName" >
-  <parm name="@lastName" value="Brown" />
-  <parm name="@NotUsed" value="******"  />
-  <parm name="@somexml" value="&lt;domain&gt;&lt;id&gt;1&lt;/id&gt;&lt;id&gt;2&lt;/id&gt;&lt;/domain&gt;" />
-  <output target="#Summary" resultsetseq="2" />
-</execute>';
+--EXEC ResultSetCapture @callXML= '<execute schema="dbo" proc="customerBalanceByLastName" >
+--  <parm name="@lastName" value="Brown" />
+--  <parm name="@NotUsed" value="******"  />
+--  <parm name="@somexml" value="&lt;domain&gt;&lt;id&gt;1&lt;/id&gt;&lt;id&gt;2&lt;/id&gt;&lt;/domain&gt;" />
+--  <output target="#Summary" resultsetseq="2" />
+--</execute>';
 
--- EXEC execProcCall @callXML= 'help';
+EXEC ResultSetCapture @callXML= '', @Command='exec customerBalanceByLastName @lastName=''Brown''', @rsTable1='#Detail', @rsColumnList1=''
 
 
 
