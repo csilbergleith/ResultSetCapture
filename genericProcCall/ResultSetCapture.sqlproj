@@ -12,7 +12,7 @@
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>genericProcCall</RootNamespace>
+    <RootNamespace>ResultSetCapture</RootNamespace>
     <AssemblyName>genericProcCall</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>

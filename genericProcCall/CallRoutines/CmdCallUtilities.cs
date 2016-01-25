@@ -6,10 +6,10 @@ using execProcCall.Models;
 using System.Xml;
 using System;
 
-namespace genericProcCall
+namespace ResultSetCapture
 {
     
-    internal sealed class tSQLtCallProcUtilities
+    internal sealed class CommandCallUtilities
 
     {
         // Parse Call XML into ProcCall Class object
@@ -94,74 +94,74 @@ namespace genericProcCall
             return procCall;
         }
         
-        // Verify the existance of the proc and parameters against the catalog using stored proc
+        // (obsolete) Verify the existance of the proc and parameters against the catalog using stored proc
         internal static bool verifyCallRequest(ref procCall CallRequest)
         {
-            string connectionString = getConnectionString();
-            int retCode;
+            //string connectionString = getConnectionString();
+            //int retCode;
 
             // using proc calls: verify the proc exists and get the paramter list
             // parameters that don't exist in the dd proc definition are removed
             // from CallRequest
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
+            //using (SqlConnection conn = new SqlConnection(connectionString))
+            //{
+            //    conn.Open();
 
-                // Setup to call admin.GetProcParameters_sp
-                // which will verify if the proc exists and return the list of parameters
-                SqlDataAdapter dbProc = new SqlDataAdapter("admin.GetProcParameters_sp", conn);
+            //    // Setup to call admin.GetProcParameters_sp
+            //    // which will verify if the proc exists and return the list of parameters
+            //    SqlDataAdapter dbProc = new SqlDataAdapter("admin.GetProcParameters_sp", conn);
 
-                dbProc.SelectCommand.CommandType = CommandType.StoredProcedure;
-                dbProc.SelectCommand.Parameters.AddWithValue("@schema", CallRequest.schemaName);
-                dbProc.SelectCommand.Parameters.AddWithValue("@procName", CallRequest.procName);
-                dbProc.SelectCommand.Parameters.Add("@RETURN_VALUE", SqlDbType.Int).Direction = ParameterDirection.ReturnValue;
-                DataSet dsParameters = new DataSet();
+            //    dbProc.SelectCommand.CommandType = CommandType.StoredProcedure;
+            //    dbProc.SelectCommand.Parameters.AddWithValue("@schema", CallRequest.schemaName);
+            //    dbProc.SelectCommand.Parameters.AddWithValue("@procName", CallRequest.procName);
+            //    dbProc.SelectCommand.Parameters.Add("@RETURN_VALUE", SqlDbType.Int).Direction = ParameterDirection.ReturnValue;
+            //    DataSet dsParameters = new DataSet();
 
-                retCode = dbProc.Fill(dsParameters);
+            //    retCode = dbProc.Fill(dsParameters);
 
-                // retCode = 0 if the proc does not exist
-                retCode = Convert.ToInt32(dbProc.SelectCommand.Parameters["@RETURN_VALUE"].Value.ToString());
+            //    // retCode = 0 if the proc does not exist
+            //    retCode = Convert.ToInt32(dbProc.SelectCommand.Parameters["@RETURN_VALUE"].Value.ToString());
 
-                // If the proc doesn't exist, return false
-                if (retCode == 0)
-                {
-                    return false;
-                }
+            //    // If the proc doesn't exist, return false
+            //    if (retCode == 0)
+            //    {
+            //        return false;
+            //    }
 
-                // list of the proc's parameters as indicated int the DB
-                List<string> dbParmName = new List<string>(20);
+            //    // list of the proc's parameters as indicated int the DB
+            //    List<string> dbParmName = new List<string>(20);
 
-                // for each parameter, get the name to lower case
-                foreach (DataRow r in dsParameters.Tables[0].Rows)
-                {
-                    dbParmName.Add(r["parameterName"].ToString().ToLower());
-                }
+            //    // for each parameter, get the name to lower case
+            //    foreach (DataRow r in dsParameters.Tables[0].Rows)
+            //    {
+            //        dbParmName.Add(r["parameterName"].ToString().ToLower());
+            //    }
 
-                // Get a list of the parameters in the request that don't 
-                // have the parameter as part of the proc parameters
-                int matchIdx;
-                List<ProcParameters> parmsNotMatched = new List<ProcParameters>();
+            //    // Get a list of the parameters in the request that don't 
+            //    // have the parameter as part of the proc parameters
+            //    int matchIdx;
+            //    List<ProcParameters> parmsNotMatched = new List<ProcParameters>();
 
-                LogMessage("");
-                foreach (ProcParameters p in CallRequest.procParms)
-                {
-                    // we're really looking for the parameter that doesn't match
-                    matchIdx = dbParmName.FindIndex(m => m.Equals(p.parmName.ToLower()));
+            //    LogMessage("");
+            //    foreach (ProcParameters p in CallRequest.procParms)
+            //    {
+            //        // we're really looking for the parameter that doesn't match
+            //        matchIdx = dbParmName.FindIndex(m => m.Equals(p.parmName.ToLower()));
 
-                    // Save the list of user provided parameters that don't exist in the DB
-                    if (matchIdx == -1)
-                    {
-                        parmsNotMatched.Add(p);
-                        LogMessage("Supplied parameter not used by procedure: " + p.parmName);
-                    }
-                }
+            //        // Save the list of user provided parameters that don't exist in the DB
+            //        if (matchIdx == -1)
+            //        {
+            //            parmsNotMatched.Add(p);
+            //            LogMessage("Supplied parameter not used by procedure: " + p.parmName);
+            //        }
+            //    }
 
-                // remove the parameters that don't match the proc parameters on the DB
-                foreach (ProcParameters p in parmsNotMatched)
-                {
-                    CallRequest.procParms.RemoveAll(m => m.parmName == p.parmName);
-                }
-            }
+            //    // remove the parameters that don't match the proc parameters on the DB
+            //    foreach (ProcParameters p in parmsNotMatched)
+            //    {
+            //        CallRequest.procParms.RemoveAll(m => m.parmName == p.parmName);
+            //    }
+            //}
 
             return true;
         }
@@ -193,6 +193,28 @@ namespace genericProcCall
             return dsResults;
         }
 
+        // Execute the command, Return a DataSet Object 
+        internal static DataSet ExecCommand(CommandCall cmd)
+        {
+            DataSet dsResults = new DataSet();
+            string connectionString = getConnectionString();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                SqlDataAdapter daExecCommand = new SqlDataAdapter(cmd.Command, conn);
+                daExecCommand.SelectCommand.CommandType = CommandType.Text;
+
+                int rc = daExecCommand.Fill(dsResults);
+
+                LogMessage("ExecCommand result = " + rc.ToString());
+
+                conn.Close();
+            }
+
+            return dsResults;
+        }
         // Build an empty DataSet with all the target tables so that we have meta data to map result sets to using stored proc
         internal static DataSet getTargetTableMetaData(procCall CallRequest)
         {
@@ -452,7 +474,7 @@ namespace genericProcCall
         }
 
         // Centralize logic for writing messages
-        internal static void LogMessage(string msg, int force = 0)
+        internal static void LogMessage(string msg, int force = 1)
         {
             if (force == 1)
             {

@@ -2,9 +2,9 @@ C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericP
 C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\bin\Debug\genericProcCall.dll
 C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\bin\Debug\genericProcCall.pdb
 C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\ResultSetCapture.sqlprojResolveAssemblyReference.cache
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\genericProcCall.dll
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\genericProcCall.pdb
 C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\Model.xml
 C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\refactor.xml
 C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\postdeploy.sql
 C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\predeploy.sql
-C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\genericProcCall.dll
-C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\genericProcCall.pdb
