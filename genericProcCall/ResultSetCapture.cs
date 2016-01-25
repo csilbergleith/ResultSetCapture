@@ -6,6 +6,7 @@ using Microsoft.SqlServer.Server;
 using ResultSetCapture;
 using execProcCall.Models;
 using System.Security;
+using System.Collections.Generic;
 
 public partial class StoredProcedures
 {
@@ -22,12 +23,16 @@ public partial class StoredProcedures
         CommandCall cmd = new CommandCall();
 
         cmd.Command = Command.ToString();
-        cmd.rsTable = rsTable1.ToString();
-        cmd.rsColList = rsColumnList1.ToString();
+
+        cmd.rsTable = new List<ResultTables>();
+
+        cmd.rsTable.Add(new ResultTables { resultSetSeq = 0, tableName = rsTable1.ToString(), columnList = rsColumnList1.ToString() });
+        //cmd.rsTable = rsTable1.ToString();
+        //cmd.rsColList = rsColumnList1.ToString();
 
         CommandCallUtilities.LogMessage("Command: " + cmd.Command);            
-        CommandCallUtilities.LogMessage("table: " + cmd.rsTable);
-        CommandCallUtilities.LogMessage("Columns: " + cmd.rsColList);
+        //CommandCallUtilities.LogMessage("table: " + cmd.rsTable);
+        //CommandCallUtilities.LogMessage("Columns: " + cmd.rsColList);
 
         // Parse command instructions to a procCall object
         //procCall CallRequest = tSQLtCallProcUtilities.parseXML(callXML.ToString());

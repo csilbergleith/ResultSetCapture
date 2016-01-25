@@ -14,8 +14,8 @@ namespace execProcCall.Models
     public class CommandCall
     {
         public string Command { get; set; }
-        public string rsTable { get; set; }
-        public string rsColList { get; set; }
+        public List<ResultTables> rsTable { get; set; }
+
     }
 
     public class ProcParameters
@@ -31,12 +31,18 @@ namespace execProcCall.Models
         public string tableName { get; set; }
     }
 
-    public class columnReferences
+    public class ResultTables
     {
-        public string databaseName { get; set; }
-        public string schema { get; set; }
+        public int resultSetSeq { get; set; }
         public string tableName { get; set; }
-        public string alias { get; set; }
-        public string columnName { get; set; }
+        public string columnList { get; set; }
     }
+    //public class columnReferences
+    //{
+    //    public string databaseName { get; set; }
+    //    public string schema { get; set; }
+    //    public string tableName { get; set; }
+    //    public string alias { get; set; }
+    //    public string columnName { get; set; }
+    //}
 }
