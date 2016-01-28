@@ -13,56 +13,31 @@ public partial class StoredProcedures
     [Microsoft.SqlServer.Server.SqlProcedure]
     public static void ResultSetCapture (SqlString callXML, SqlString Command, SqlString rsTable1, SqlString rsColumnList1)
     {
-        // display help instructions
-        if(callXML.ToString() == "?" || callXML.ToString().ToLower() == "help" )
-        {
-            CommandCallUtilities.showHelp();
-            return;
-        }
-
+        // Storage for the parameters: 
         CommandCall cmd = new CommandCall();
 
+        // the command to execute
         cmd.Command = Command.ToString();
 
+        // the tables to hold the result sets produced
         cmd.rsTable = new List<ResultTables>();
 
-        cmd.rsTable.Add(new ResultTables { resultSetSeq = 0, tableName = rsTable1.ToString(), columnList = rsColumnList1.ToString() });
-        //cmd.rsTable = rsTable1.ToString();
-        //cmd.rsColList = rsColumnList1.ToString();
+        // Could have a series of cmd.rsTable.Add(...) for each result set if the rsTableN is not null
+        // Add the result set table name, column list and a result set sequence number
+        cmd.rsTable.Add(new ResultTables { resultSetSeq = 1, tableName = rsTable1.ToString(), columnList = rsColumnList1.ToString() });
 
-        CommandCallUtilities.LogMessage("Command: " + cmd.Command);            
-        //CommandCallUtilities.LogMessage("table: " + cmd.rsTable);
-        //CommandCallUtilities.LogMessage("Columns: " + cmd.rsColList);
+        // the column list; null; empty or * means all; otherwise a csv list
+        //***** just store it here
+        //*******************************************************************
 
-        // Parse command instructions to a procCall object
-        //procCall CallRequest = tSQLtCallProcUtilities.parseXML(callXML.ToString());
-        
-        // Verify the proc & parameters exist against the DB; remove unmatched parameters
-        //Boolean procCallVerified = tSQLtCallProcUtilities.verifyCallRequest(ref CallRequest);
-
-        //if (procCallVerified)
-        //{
-        //    tSQLtCallProcUtilities.LogMessage("");
-        //    tSQLtCallProcUtilities.LogMessage("Prepare execution for: " + CallRequest.schemaName + "." + CallRequest.procName);
-        //}
-        //else
-        //{
-        //    tSQLtCallProcUtilities.LogMessage("", 1);
-        //    tSQLtCallProcUtilities.LogMessage("Could not find: " + CallRequest.schemaName + "." + CallRequest.procName + " terminating", 1);
-        //    return;
-        //}
-
-        // Build the execute statement from the proc name and parameters; 
         // Execute & Save results to a dataSet
-        //DataSet procCallResults = tSQLtCallProcUtilities.execProcCall(CallRequest);
-
         DataSet CommnandResults = CommandCallUtilities.ExecCommand(cmd);
 
         // Build a dataset with the output tables
-        //DataSet dsTargetTables = tSQLtCallProcUtilities.getTargetTableMetaData(CallRequest);
+        DataSet dsTargetTables = CommandCallUtilities.getTargetTableMetaData(cmd);
 
         // Map the columns of the result set to the columns of the output table; 
-        //bool result = CommandCallUtilities.mapResultsToOutputTables(procCallResults, dsTargetTables, CallRequest);
+        bool result = CommandCallUtilities.mapResultsToOutputTables(CommnandResults, dsTargetTables, cmd);
 
         return;
     }

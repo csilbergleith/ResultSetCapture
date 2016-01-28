@@ -215,8 +215,9 @@ namespace ResultSetCapture
 
             return dsResults;
         }
-        // Build an empty DataSet with all the target tables so that we have meta data to map result sets to using stored proc
-        internal static DataSet getTargetTableMetaData(procCall CallRequest)
+        
+        // Returns a DataSet with meta data of the target tables
+        internal static DataSet getTargetTableMetaData(CommandCall CallRequest)
         {
             DataSet dsTargets = new DataSet();
             DataTable dtTarget = new DataTable();
@@ -225,53 +226,18 @@ namespace ResultSetCapture
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-
-                // Setup the table verification call
-                SqlDataAdapter daTargetTable = new SqlDataAdapter("admin.VerifyTableExists_sp", conn);
-
-                //SqlDataReader drVerifyTable;
-                SqlCommand cmd = new SqlCommand("admin.VerifyTableExists_sp", conn);
-                int retCode;
-
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                foreach (outTables tgt in CallRequest.tblOut)
-                {
-
-                    // add the tableName parameter and the return value capture
-                    if (tgt.tableName != null)
-                    {
-                        cmd.Parameters.AddWithValue("@tablename", tgt.tableName);
-                        cmd.Parameters.Add("@RETURN_VALUE", SqlDbType.Int).Direction = ParameterDirection.ReturnValue;
-                    }
-
-
-                    // get the retCode: 1=Exists; 0=Not Exist
+                
+                foreach (ResultTables tgt in CallRequest.rsTable)
+                {                    
+                    // ** Should be a Try Catch block here ************
                     conn.Open();
-                    cmd.ExecuteNonQuery();
-                    retCode = Convert.ToInt32(cmd.Parameters["@RETURN_VALUE"].Value.ToString());
-                    conn.Close();
 
-                    cmd.Parameters.Clear();
+                    queryStr = "SELECT * FROM " + tgt.tableName + " WHERE 1 = 0";
+                    SqlDataAdapter daTgtTable = new SqlDataAdapter(queryStr, conn);
+                    daTgtTable.SelectCommand.CommandType = CommandType.Text;
+                    daTgtTable.Fill(dsTargets, tgt.tableName);
 
-                    // Check if the table exists
-
-                    if (retCode == 1)
-                    {
-                        conn.Open();
-
-                        queryStr = "SELECT * FROM " + tgt.tableName + " WHERE 1 = 0";
-                        SqlDataAdapter daTgtTable = new SqlDataAdapter(queryStr, conn);
-                        daTgtTable.SelectCommand.CommandType = CommandType.Text;
-                        daTgtTable.Fill(dsTargets, tgt.tableName);
-
-                        conn.Close();
-                    }
-                    else
-                    {
-                        // saved the failed table names and delete them
-                    }
-
+                    conn.Close();                    
                 }
 
             }
@@ -280,7 +246,7 @@ namespace ResultSetCapture
         }
 
         // map matching column names between the results table and the target table
-        internal static bool mapResultsToOutputTables(DataSet procCallResults, DataSet dsTargetTables, procCall CallRequest)
+        internal static bool mapResultsToOutputTables(DataSet CommnandResults, DataSet dsTargetTables, CommandCall CallRequest)
         {
             // loop through result set tables; find matching columns and write out the results
             DataTable dtResultsTable = new DataTable();
@@ -292,7 +258,7 @@ namespace ResultSetCapture
 
             int dtIdx = 0;
             // Check how many we have of each; not enough output tables means nothing written to it
-            int resultTableCount = procCallResults.Tables.Count;
+            int resultTableCount = CommnandResults.Tables.Count;
             int targetTableCount = dsTargetTables.Tables.Count;
 
             // no results, we're done
@@ -311,12 +277,12 @@ namespace ResultSetCapture
                 // get the output table name and find it in the target table list; get the resultSetSeq number
                 tblName = dsTargetTables.Tables[dtIdx].TableName;
 
-                resultToTargetMap = CallRequest.tblOut.Find(m => m.tableName == tblName).resultSetSeq -1;
+                resultToTargetMap = CallRequest.rsTable.Find(m => m.tableName == tblName).resultSetSeq -1;
 
                 // call function to get a list of the matching columns if a mapping exists
                 if(resultToTargetMap > -1)
                 {
-                    matchedColumns = findMatchinColumns(procCallResults.Tables[resultToTargetMap], dsTargetTables.Tables[dtIdx]);
+                    matchedColumns = findMatchinColumns(CommnandResults.Tables[resultToTargetMap], dsTargetTables.Tables[dtIdx]);
                 }
                 else
                 {
@@ -355,7 +321,7 @@ namespace ResultSetCapture
                         int rowCount;
                         bool mRow;
 
-                        foreach (DataRow r in procCallResults.Tables[resultToTargetMap].Rows)
+                        foreach (DataRow r in CommnandResults.Tables[resultToTargetMap].Rows)
                         {
                             // Add the VALUES clause
                             sqlValues = " VALUES ( ";
