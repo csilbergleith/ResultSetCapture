@@ -11,7 +11,11 @@ using System.Collections.Generic;
 public partial class StoredProcedures
 {
     [Microsoft.SqlServer.Server.SqlProcedure]
-    public static void ResultSetCapture (SqlString callXML, SqlString Command, SqlString rsTable1, SqlString rsColumnList1)
+    public static void ResultSetCapture 
+       (SqlString callXML, SqlString Command, 
+        SqlString rsTable1, SqlString rsColumnList1, 
+        SqlString? rsTable2, SqlString? rsColumnList2
+       )
     {
         // Storage for the parameters: 
         CommandCall cmd = new CommandCall();
@@ -25,6 +29,8 @@ public partial class StoredProcedures
         // Could have a series of cmd.rsTable.Add(...) for each result set if the rsTableN is not null
         // Add the result set table name, column list and a result set sequence number
         cmd.rsTable.Add(new ResultTables { resultSetSeq = 1, tableName = rsTable1.ToString(), columnList = rsColumnList1.ToString() });
+
+        cmd.rsTable.Add(new ResultTables { resultSetSeq = 2, tableName = rsTable2.ToString(), columnList = rsColumnList2.ToString() });
 
         // the column list; null; empty or * means all; otherwise a csv list
         //***** just store it here
