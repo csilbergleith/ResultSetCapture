@@ -16,6 +16,6 @@
 
 ** Supporting actions
      Drop
-       [dbo].[execProcCall] (Procedure)
+       [dbo].[ResultSetCapture] (Procedure)
      Create
-       [dbo].[execProcCall] (Procedure)
+       [dbo].[ResultSetCapture] (Procedure)
