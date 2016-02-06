@@ -30,7 +30,8 @@ create table #Summary2
 --  <output target="#Summary" resultsetseq="2" />
 --</execute>';
 
-EXEC ResultSetCapture @callXML= '', @Command='exec customerBalanceByLastName @lastName=''Smith''', @rsTable1='#Detail', @rsColumnList1='*'
+EXEC ResultSetCapture @Command='exec customerBalanceByLastName @lastName=''Smith''', @rsTable1='#Detail', @rsColumnList1='*'
+			,@rsTable2 = '', @rsColumnList2 = ''
 
 
 

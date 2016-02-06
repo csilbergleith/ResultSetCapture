@@ -13,9 +13,6 @@
        [genericProcCall] (Assembly)
      Create
        [genericProcCall] (Assembly)
+       [dbo].[ResultSetCapture] (Procedure)
 
 ** Supporting actions
-     Drop
-       [dbo].[execProcCall] (Procedure)
-     Create
-       [dbo].[execProcCall] (Procedure)
