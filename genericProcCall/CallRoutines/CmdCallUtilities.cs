@@ -252,6 +252,7 @@ namespace ResultSetCapture
             DataTable dtResultsTable = new DataTable();
             DataTable dtOuptutTable = new DataTable();
             List<string> matchedColumns = new List<string>();
+            List<ColumnRef> crSelectedCoulmns = GetTargetColumns("");
             string sqlInsert = "";
             string sqlValues = "";
             string sqlCommandText = "";
@@ -270,6 +271,7 @@ namespace ResultSetCapture
             // resultToTargetMap let's us map a specific result set to a target table
             int resultToTargetMap;
             string tblName;
+            string csvColList;
 
             // as long as we have another result set and target table, keep looping
             while(dtIdx <= targetTableCount -1 )
@@ -279,10 +281,12 @@ namespace ResultSetCapture
 
                 resultToTargetMap = CallRequest.rsTable.Find(m => m.tableName == tblName).resultSetSeq -1;
 
+                csvColList = CallRequest.rsTable.Find(m => m.tableName == tblName).columnList;
+
                 // call function to get a list of the matching columns if a mapping exists
                 if(resultToTargetMap > -1)
                 {
-                    matchedColumns = findMatchinColumns(CommnandResults.Tables[resultToTargetMap], dsTargetTables.Tables[dtIdx]);
+                    matchedColumns = FindMatchingColumns(CommnandResults.Tables[resultToTargetMap], dsTargetTables.Tables[dtIdx], csvColList);
                 }
                 else
                 {
@@ -370,18 +374,20 @@ namespace ResultSetCapture
         }
 
         // find that column names that are the same between the target table and the result sets table
-        private static List<string> findMatchinColumns(DataTable resultSet, DataTable targetTable)
+        private static List<string> FindMatchingColumns(DataTable resultSet, DataTable targetTable, string csvColList)
         {
             List<string> resultSetColumnNames = new List<string>(100);
             List<string> targetTableColumnNames = new List<string>(100);
             List<string> matchingColumnNames = new List<string>(100);
             List<string> unMatchedColumnNames = new List<string>(100);
 
+            List<string> rsColList = new List<string>(csvColList.Split(','));
 
             // get the column names for the resultSet
             foreach(DataColumn c in resultSet.Columns)
             {
-                resultSetColumnNames.Add(c.ColumnName);                
+                resultSetColumnNames.Add(c.ColumnName);   
+                // if the column name is in the list columns, capture the meta data
             }
 
             // get the column names for the target table
@@ -390,6 +396,9 @@ namespace ResultSetCapture
                 targetTableColumnNames.Add(col.ColumnName);
             }
             
+            // see if any columns are missing from the target table, based on column list
+            // exec ALTER <tablename> ADD COLUMN for each missing column based on 
+
             // find the names that are in both lists
             foreach(string columnName in resultSetColumnNames)
             {
@@ -420,6 +429,7 @@ namespace ResultSetCapture
             return "context connection=true";
         }
 
+        // Show Help - Obsolete
         internal static void showHelp()
         {
             LogMessage("XML Input Format", 1);
@@ -440,6 +450,7 @@ namespace ResultSetCapture
         }
 
         // Centralize logic for writing messages
+        // need to make this a single global objects
         internal static void LogMessage(string msg, int force = 1)
         {
             if (force == 1)
@@ -447,6 +458,23 @@ namespace ResultSetCapture
                 SqlContext.Pipe.Send(msg);
             }
            
+        }
+
+        // split the csv list of columns to capture and retur
+        internal static List<ColumnRef> GetTargetColumns (string csvColList)
+        {
+            string [] ColList = new string [20] ;
+            List<ColumnRef> rsColRef = new List<ColumnRef>();
+            
+            ColList = csvColList.Split(',');
+
+            foreach (string ColName in ColList)
+            {
+                rsColRef.Add(new ColumnRef { columnName = ColName });
+            }
+
+            return rsColRef;
+
         }
 
     }
