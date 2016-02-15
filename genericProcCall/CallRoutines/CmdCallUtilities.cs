@@ -404,7 +404,7 @@ namespace ResultSetCapture
                     CaptureColumns.Add(new ColumnRef { columnName = c.ColumnName, DataType = c.DataType });
                 }
             }
-            
+
             // get the column names for the target table
             foreach (DataColumn col in targetTable.Columns)
             {
@@ -420,7 +420,9 @@ namespace ResultSetCapture
                 if(string.IsNullOrEmpty(Found))
                 {
                     LogMessage("Column not in target table: " + targetTable.TableName + ". Column: " + cr.columnName + " Datatype: " + cr.DataType.Name );
-                    targetTable.Columns.Add(cr.columnName, cr.DataType);
+                    targetTable.Columns.Add(cr.columnName, cr.DataType);    // **** Redundant? **** maybe; might need for alternatives to SQL INSERT Statements
+                    targetTableColumnNames.Add(cr.columnName); 
+
                     using (var sqlConn = new SqlConnection(getConnectionString()))
                     {
                         switch(cr.DataType.Name.ToLower()) 
@@ -449,7 +451,6 @@ namespace ResultSetCapture
                     }
                 }
             }
-
 
             //*****************************************************
             // find the names that are in both lists
