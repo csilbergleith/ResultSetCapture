@@ -40,7 +40,6 @@ namespace execProcCall.Models
     public class ColumnRef
     {
         public string columnName { get; set; }
-        public string DataTypeNet { get; set; }
-        public string DataTypeSQL { get; set; }
+        public System.Type DataType { get; set; }
     }
 }

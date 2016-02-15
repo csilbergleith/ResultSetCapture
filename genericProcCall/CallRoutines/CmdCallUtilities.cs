@@ -381,15 +381,30 @@ namespace ResultSetCapture
             List<string> matchingColumnNames = new List<string>(100);
             List<string> unMatchedColumnNames = new List<string>(100);
 
+            // The list of columns to capture
             List<string> rsColList = new List<string>(csvColList.Split(','));
+            List<ColumnRef> CaptureColumns = new List<ColumnRef>();
 
-            // get the column names for the resultSet
+            string CaptureColumnMatch;
+            string Found;
+            SqlCommand sqlCmd;
+            string sqlType;
+
+            // get the column names for the resultSet and check if they're in the select list
+            // if the selected column list is * get all the results set columns
+            // otherwise only get the ones that matched the selected list
             foreach(DataColumn c in resultSet.Columns)
             {
                 resultSetColumnNames.Add(c.ColumnName);   
-                // if the column name is in the list columns, capture the meta data
+                // if the result set column name is in the rsColList capture columns
+                // save the meta data
+                CaptureColumnMatch = rsColList.Find(m => m.ToLower() == c.ColumnName.ToLower());
+                if ( (! string.IsNullOrEmpty(CaptureColumnMatch) ) || rsColList[0] == "*" )
+                {
+                    CaptureColumns.Add(new ColumnRef { columnName = c.ColumnName, DataType = c.DataType });
+                }
             }
-
+            
             // get the column names for the target table
             foreach (DataColumn col in targetTable.Columns)
             {
@@ -398,7 +413,45 @@ namespace ResultSetCapture
             
             // see if any columns are missing from the target table, based on column list
             // exec ALTER <tablename> ADD COLUMN for each missing column based on 
+            foreach (ColumnRef cr in CaptureColumns)
+            {
+                // if the column is not found add it to the table
+                Found = targetTableColumnNames.Find(m => m.ToLower() == cr.columnName.ToLower());
+                if(string.IsNullOrEmpty(Found))
+                {
+                    LogMessage("Column not in target table: " + targetTable.TableName + ". Column: " + cr.columnName + " Datatype: " + cr.DataType.Name );
+                    targetTable.Columns.Add(cr.columnName, cr.DataType);
+                    using (var sqlConn = new SqlConnection(getConnectionString()))
+                    {
+                        switch(cr.DataType.Name.ToLower()) 
+                        {   case "string": 
+                                sqlType = "Varchar(100)"; 
+                                break;
+                            case "int32": 
+                                sqlType = "int" ;
+                                break;
+                            case "decimal":
+                                sqlType = "decimal(10,4)";
+                                break;
+                            case "guid":
+                                sqlType = "uniqueidentifier";
+                                break;
+                            default:
+                                sqlType = "variant";
+                                break;
+                        }
 
+                        sqlCmd = sqlConn.CreateCommand();
+                        sqlCmd.CommandText = String.Format("ALTER TABLE {0} ADD {1} {2} ",  targetTable.TableName, cr.columnName, sqlType);
+                        sqlConn.Open();
+                        sqlCmd.ExecuteNonQuery();
+
+                    }
+                }
+            }
+
+
+            //*****************************************************
             // find the names that are in both lists
             foreach(string columnName in resultSetColumnNames)
             {

@@ -1,13 +1,12 @@
-﻿
-
-create table #Detail
-(customerId	int,
- firstName nvarchar(50),
- lastname varchar(50),
- clearedBalance money,
- unclearedBalance money,
- emailAddress nvarchar(50),
- rowguid uniqueidentifier
+﻿create table #Detail
+(--customerId	int,
+ --firstName nvarchar(50),
+ -- lastname varchar(50),
+ --clearedBalance money,
+ --unclearedBalance money,
+ --emailAddress nvarchar(50),
+ --rowguid uniqueidentifier
+ id int
 );
 
 
