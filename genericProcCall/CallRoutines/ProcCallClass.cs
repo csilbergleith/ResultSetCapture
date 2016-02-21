@@ -37,12 +37,9 @@ namespace execProcCall.Models
         public string tableName { get; set; }
         public string columnList { get; set; }
     }
-    //public class columnReferences
-    //{
-    //    public string databaseName { get; set; }
-    //    public string schema { get; set; }
-    //    public string tableName { get; set; }
-    //    public string alias { get; set; }
-    //    public string columnName { get; set; }
-    //}
+    public class ColumnRef
+    {
+        public string columnName { get; set; }
+        public System.Type DataType { get; set; }
+    }
 }
