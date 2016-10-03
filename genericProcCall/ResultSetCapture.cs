@@ -30,12 +30,12 @@ public partial class StoredProcedures
         // rsColumnList is the list of columns to capture * = All
         if ( rsTable1.ToString() != "")
         {            
-            cmd.rsTable.Add(new ResultTables { resultSetSeq = 1, tableName = rsTable1.ToString(), columnList = rsColumnList1.ToString() });
+            cmd.rsTable.Add(new ResultTables { resultSetSeq = 1, tableName = rsTable1.ToString(), columnList = rsColumnList1.ToString().ToLower() });
         }
         
         if  ( rsTable2.ToString() != "" )
         {
-            cmd.rsTable.Add(new ResultTables { resultSetSeq = 2, tableName = rsTable2.ToString(), columnList = rsColumnList2.ToString() });
+            cmd.rsTable.Add(new ResultTables { resultSetSeq = 2, tableName = rsTable2.ToString(), columnList = rsColumnList2.ToString().ToLower() });
         }
        
         //*******************************************************************
@@ -43,14 +43,16 @@ public partial class StoredProcedures
         // Execute & Save results to a dataSet
         DataSet CommnandResults = CommandCallUtilities.ExecCommand(cmd);
 
+        DataSet dsTargetTablesOut = CommandCallUtilities.getTargetTableMetaData(cmd);
+
         // Build a dataset with the output tables
-        DataSet dsTargetTables = CommandCallUtilities.getTargetTableMetaData(cmd);
+        DataSet dsResultSetSchema = CommandCallUtilities.getResultSetMetaData(cmd);
 
         // Use the columnList choose the columns and meta data from the result set
         // and then add any columns that are missing to the target table
 
         // Map the columns of the result set to the columns of the output table; 
-        bool result = CommandCallUtilities.mapResultsToOutputTables(CommnandResults, dsTargetTables, cmd);
+        bool result = CommandCallUtilities.mapResultsToOutputTables(CommnandResults, dsTargetTablesOut, dsResultSetSchema, cmd);
 
         return;
     }

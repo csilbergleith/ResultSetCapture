@@ -1,0 +1,25 @@
+﻿** Highlights
+     Tables that will be rebuilt
+       None
+     Clustered indexes that will be dropped
+       None
+     Clustered indexes that will be created
+       None
+     Possible data issues
+       None
+
+** User actions
+     Drop
+       [genericProcCall] (Assembly)
+     Create
+       [genericProcCall] (Assembly)
+
+** Supporting actions
+     Drop
+       [dbo].[ResultSetCapture] (Procedure)
+     Create
+       [dbo].[ResultSetCapture] (Procedure)
+
+If this deployment is executed, changes to [dbo].[ResultSetCapture] might introduce run-time errors in [dbo].[exResultSetCapture].
+If this deployment is executed, changes to [dbo].[ResultSetCapture] might introduce run-time errors in [dbo].[fnResultSetCapture].
+

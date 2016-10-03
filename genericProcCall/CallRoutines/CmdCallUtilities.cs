@@ -12,84 +12,84 @@ namespace ResultSetCapture
     internal sealed class CommandCallUtilities
 
     {
-        // Parse Call XML into ProcCall Class object
+        // (obsolete) Parse Call XML into ProcCall Class object
         internal static procCall parseXML(string CallProcRequest)
         {
-            string myXML = CallProcRequest;
+        //    string myXML = CallProcRequest;
         
-            // SECTION 1: Shred the xml into parameters and result tables
-            //------------------------------------------------------------
-            string value = "";
-            string attrbName = "";
-            string dir = "";
-            string targetTableName = "";
-            int resultSetMappingId;
+        //     SECTION 1: Shred the xml into parameters and result tables
+        //    ------------------------------------------------------------
+        //    string value = "";
+        //    string attrbName = "";
+        //    string dir = "";
+        //    string targetTableName = "";
+        //    int resultSetMappingId;
 
             procCall procCall = new procCall();
 
-            XmlDocument xmlDoc = new XmlDocument();
+        //    XmlDocument xmlDoc = new XmlDocument();
 
-            xmlDoc.LoadXml(myXML);
+        //    xmlDoc.LoadXml(myXML);
 
-            XmlNodeList xnList = xmlDoc.SelectNodes("/execute");
+        //    XmlNodeList xnList = xmlDoc.SelectNodes("/execute");
 
-            XmlNode node = xnList[0];
+        //    XmlNode node = xnList[0];
 
-            string procName = node.Attributes["proc"].Value;
-            string schema = node.Attributes["schema"].Value;
+        //    string procName = node.Attributes["proc"].Value;
+        //    string schema = node.Attributes["schema"].Value;
 
-            LogMessage("");
-            LogMessage("Proc: " + schema + "." + procName);
+        //    LogMessage("");
+        //    LogMessage("Proc: " + schema + "." + procName);
 
-            procCall.procName = procName;
-            procCall.schemaName = schema;
+        //    procCall.procName = procName;
+        //    procCall.schemaName = schema;
             
-            xnList = xmlDoc.SelectNodes("/execute/output");
+        //    xnList = xmlDoc.SelectNodes("/execute/output");
 
-            // get the list of output tables, in the event of multiple 
-            // result sets. Sequence is important here as we'll
-            // map the resulting dataset.tables in the order listed here
-            procCall.tblOut = new List<outTables>();
+        //     get the list of output tables, in the event of multiple 
+        //     result sets. Sequence is important here as we'll
+        //     map the resulting dataset.tables in the order listed here
+        //    procCall.tblOut = new List<outTables>();
 
-            // a default value for mapping the table to the result set
-            int defaultSeq = 1;
+        //     a default value for mapping the table to the result set
+        //    int defaultSeq = 1;
 
-            LogMessage("");
-            foreach (XmlNode xn in xnList)
-            {
-                // get the list of output tables
-                // resultSetSeq will be the order the results are
-                // stored in if multiple result sets
-                targetTableName = xn.Attributes["target"].Value;
+        //    LogMessage("");
+        //    foreach (XmlNode xn in xnList)
+        //    {
+        //         get the list of output tables
+        //         resultSetSeq will be the order the results are
+        //         stored in if multiple result sets
+        //        targetTableName = xn.Attributes["target"].Value;
 
-                // if a resultsetseq is given use it otherwise use sequential counter
-                resultSetMappingId = xn.Attributes["resultsetseq"] == null ? defaultSeq : Convert.ToInt32(xn.Attributes["resultsetseq"].Value);
+        //         if a resultsetseq is given use it otherwise use sequential counter
+        //        resultSetMappingId = xn.Attributes["resultsetseq"] == null ? defaultSeq : Convert.ToInt32(xn.Attributes["resultsetseq"].Value);
 
-                procCall.tblOut.Add(new outTables { resultSetSeq = resultSetMappingId, tableName = targetTableName });
-                LogMessage("Output TableName: " + xn.Attributes["target"].Value);
-                defaultSeq++;
-            }
+        //        procCall.tblOut.Add(new outTables { resultSetSeq = resultSetMappingId, tableName = targetTableName });
+        //        LogMessage("Output TableName: " + xn.Attributes["target"].Value);
+        //        defaultSeq++;
+        //    }
 
-            xnList = xmlDoc.SelectNodes("/execute/parm");
+        //    xnList = xmlDoc.SelectNodes("/execute/parm");
 
-            List<ProcParameters> parms = new List<ProcParameters>();
-            procCall.procParms = new List<ProcParameters>();
+        //    List<ProcParameters> parms = new List<ProcParameters>();
+        //    procCall.procParms = new List<ProcParameters>();
 
-            LogMessage("");
-            // get the parameter list <parm name value direction />
-            if(xnList != null)
-            {   
-                foreach (XmlNode xn in xnList)
-                {
-                    attrbName = xn.Attributes["name"].Value;
-                    value = xn.Attributes["value"].Value;
-                    dir = xn.Attributes["direction"] == null ? "input" : xn.Attributes["direction"].Value;
-                    LogMessage("Attribute: " + attrbName + " = " + value);
-                    // save the list of parameters and their values
-                    parms.Add(new ProcParameters { parmName = attrbName, parmValue = value, parmDirection = dir });
-                    procCall.procParms.Add(new ProcParameters { parmName = attrbName, parmValue = value, parmDirection = dir });
-                }
-            }
+        //    LogMessage("");
+        //     get the parameter list <parm name value direction />
+        //    if(xnList != null)
+        //    {   
+        //        foreach (XmlNode xn in xnList)
+        //        {
+        //            attrbName = xn.Attributes["name"].Value;
+        //            value = xn.Attributes["value"].Value;
+        //            dir = xn.Attributes["direction"] == null ? "input" : xn.Attributes["direction"].Value;
+        //            LogMessage("Attribute: " + attrbName + " = " + value);
+        //             save the list of parameters and their values
+        //            parms.Add(new ProcParameters { parmName = attrbName, parmValue = value, parmDirection = dir });
+        //            procCall.procParms.Add(new ProcParameters { parmName = attrbName, parmValue = value, parmDirection = dir });
+        //        }
+        //    }
 
             return procCall;
         }
@@ -166,34 +166,34 @@ namespace ResultSetCapture
             return true;
         }
         
-        // Execute the requested call 
+        // (obsolete) Execute the requested call 
         internal static DataSet execProcCall(procCall CallRequest)
         {
             DataSet dsResults = new DataSet();
-            string connectionString = getConnectionString();
+            //string connectionString = getConnectionString();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
+            //using (SqlConnection conn = new SqlConnection(connectionString))
+            //{
+            //    conn.Open();
 
-                SqlDataAdapter daExecProcCall = new SqlDataAdapter(CallRequest.schemaName + "." + CallRequest.procName, conn);
-                daExecProcCall.SelectCommand.CommandType = CommandType.StoredProcedure;
+            //    SqlDataAdapter daExecProcCall = new SqlDataAdapter(CallRequest.schemaName + "." + CallRequest.procName, conn);
+            //    daExecProcCall.SelectCommand.CommandType = CommandType.StoredProcedure;
 
-                // Add parameters to the command
-                foreach(ProcParameters p in CallRequest.procParms)
-                {
-                    daExecProcCall.SelectCommand.Parameters.Add(new SqlParameter(p.parmName, p.parmValue));
-                }
+            //    // Add parameters to the command
+            //    foreach(ProcParameters p in CallRequest.procParms)
+            //    {
+            //        daExecProcCall.SelectCommand.Parameters.Add(new SqlParameter(p.parmName, p.parmValue));
+            //    }
 
-                daExecProcCall.Fill(dsResults);
+            //    daExecProcCall.Fill(dsResults);
 
-                conn.Close();
-            }
+            //    conn.Close();
+            //}
 
             return dsResults;
         }
 
-        // Execute the command, Return a DataSet Object 
+        // Execute the SQL command, Return a DataSet with the result set(s)
         internal static DataSet ExecCommand(CommandCall cmd)
         {
             DataSet dsResults = new DataSet();
@@ -207,17 +207,18 @@ namespace ResultSetCapture
                 daExecCommand.SelectCommand.CommandType = CommandType.Text;
 
                 int rc = daExecCommand.Fill(dsResults);
-
+                               
                 LogMessage("ExecCommand result = " + rc.ToString());
 
+                
                 conn.Close();
             }
 
             return dsResults;
         }
         
-        // Returns a DataSet with meta data of the target tables
-        internal static DataSet getTargetTableMetaData(CommandCall CallRequest)
+        // Returns dataset with meta data of the target tables
+        internal static DataSet getTargetTableMetaData(CommandCall cmd)
         {
             DataSet dsTargets = new DataSet();
             DataTable dtTarget = new DataTable();
@@ -226,9 +227,9 @@ namespace ResultSetCapture
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                
-                foreach (ResultTables tgt in CallRequest.rsTable)
-                {                    
+
+                foreach (ResultTables tgt in cmd.rsTable)
+                {
                     // ** Should be a Try Catch block here ************
                     conn.Open();
 
@@ -237,7 +238,7 @@ namespace ResultSetCapture
                     daTgtTable.SelectCommand.CommandType = CommandType.Text;
                     daTgtTable.Fill(dsTargets, tgt.tableName);
 
-                    conn.Close();                    
+                    conn.Close();
                 }
 
             }
@@ -245,8 +246,52 @@ namespace ResultSetCapture
             return dsTargets;
         }
 
+        // Returns a DataSet with meta data of the result sets
+        internal static DataSet getResultSetMetaData(CommandCall CallRequest)
+        {
+            DataSet dsResultSetSchema = new DataSet();
+            DataTable schemaTable = new DataTable();
+            DataTable resultSetTable = new DataTable();
+            string connectionString = getConnectionString();
+
+            // Get Schema Table for the result sets
+            SqlDataReader SqlDr;
+            SqlCommand SqlCmd;
+
+            //int rowCount;
+            int tblCount = 0;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                SqlCmd = conn.CreateCommand();
+                SqlCmd.CommandText = CallRequest.Command; 
+
+                SqlDr = SqlCmd.ExecuteReader();
+                SqlDr.Read();
+                tblCount = 0;
+                // for each result table in SqlDataReader:
+                while (SqlDr.HasRows)
+                {
+                    schemaTable = SqlDr.GetSchemaTable();
+                    schemaTable.TableName = CallRequest.rsTable[tblCount].tableName;
+                    dsResultSetSchema.Tables.Add(schemaTable);
+                    
+                    // capture the result set table here?
+                    //resultSetTable.Load(SqlDr);
+
+                    SqlDr.NextResult();
+                    tblCount += 1;
+                }
+
+                conn.Close();
+            }
+
+            return dsResultSetSchema;
+        }
+
         // map matching column names between the results table and the target table
-        internal static bool mapResultsToOutputTables(DataSet CommnandResults, DataSet dsTargetTables, CommandCall CallRequest)
+        internal static bool mapResultsToOutputTables(DataSet CommnandResults, DataSet dsTargetTableOut, DataSet dsResultSetSchema, CommandCall CallRequest)
         {
             // loop through result set tables; find matching columns and write out the results
             DataTable dtResultsTable = new DataTable();
@@ -254,13 +299,13 @@ namespace ResultSetCapture
             List<string> matchedColumns = new List<string>();
             List<ColumnRef> crSelectedCoulmns = GetTargetColumns("");
             string sqlInsert = "";
-            string sqlValues = "";
+            var sqlValues = "";
             string sqlCommandText = "";
 
             int dtIdx = 0;
             // Check how many we have of each; not enough output tables means nothing written to it
             int resultTableCount = CommnandResults.Tables.Count;
-            int targetTableCount = dsTargetTables.Tables.Count;
+            int targetTableCount = dsResultSetSchema.Tables.Count;
 
             // no results, we're done
             if (resultTableCount == 0) return true;
@@ -277,7 +322,7 @@ namespace ResultSetCapture
             while(dtIdx <= targetTableCount -1 )
             {
                 // get the output table name and find it in the target table list; get the resultSetSeq number
-                tblName = dsTargetTables.Tables[dtIdx].TableName;
+                tblName = dsResultSetSchema.Tables[dtIdx].TableName;
 
                 resultToTargetMap = CallRequest.rsTable.Find(m => m.tableName == tblName).resultSetSeq -1;
 
@@ -286,7 +331,7 @@ namespace ResultSetCapture
                 // call function to get a list of the matching columns if a mapping exists
                 if(resultToTargetMap > -1)
                 {
-                    matchedColumns = FindMatchingColumns(CommnandResults.Tables[resultToTargetMap], dsTargetTables.Tables[dtIdx], csvColList);
+                    matchedColumns = FindMatchingColumns(CommnandResults.Tables[resultToTargetMap], dsTargetTableOut.Tables[dtIdx], dsResultSetSchema.Tables[dtIdx], csvColList);
                 }
                 else
                 {
@@ -298,7 +343,8 @@ namespace ResultSetCapture
                 {
                     // We have matching columns:
                     // Build the insert statement with the column names from the matched columns
-                    sqlInsert = "INSERT " + dsTargetTables.Tables[dtIdx].TableName + " (";
+                    sqlInsert = "INSERT " + dsResultSetSchema.Tables[dtIdx].TableName + " (";
+
 
                     // Add the columns to be inserted
                     foreach(string m in matchedColumns)
@@ -317,13 +363,16 @@ namespace ResultSetCapture
 
                     LogMessage(""); // create a line break
 
-                    // for each row in the result set, build the VALUES clause and execut the INSERT
+                    // for each row in the result set, build the VALUES clause and execute the INSERT
                     using (SqlConnection conn = new SqlConnection(connectionString))
                     {
                         conn.Open();
                         SqlCommand tsqlWrite = new SqlCommand("", conn);
                         int rowCount;
                         bool mRow;
+                        System.Type dc;
+                        string colValue;
+                        byte[] ba;
 
                         foreach (DataRow r in CommnandResults.Tables[resultToTargetMap].Rows)
                         {
@@ -336,6 +385,29 @@ namespace ResultSetCapture
                                 //quoteName = true; //quote every thing 
 
                                 mRow = DBNull.Value.Equals(r[m]);
+                                dc = r[m].GetType();
+                                
+                                switch (dc.Name.ToLower())
+                                {
+                                    case "byte[]":
+                                        ba = (byte[])r[m];
+                                        colValue = BitConverter.ToString(ba);
+                                        colValue = "0x" + colValue.Replace("-","") + ",";
+                                        break;
+                                    case "boolean":
+                                        if(r[m].ToString() == "True")
+                                        {
+                                            colValue = "1,";
+                                        }
+                                        else
+                                        {
+                                            colValue = "0,";
+                                        }
+                                        break;
+                                    default:
+                                        colValue = "N'" + r[m].ToString().Replace("'","''") + "', ";
+                                        break;
+                                }
 
                                 if (DBNull.Value.Equals(r[m]))
                                 {
@@ -343,7 +415,7 @@ namespace ResultSetCapture
                                 }
                                 else
                                 {
-                                    sqlValues += "'" + r[m] + "', ";
+                                    sqlValues += colValue;
                                 }
                             }
 
@@ -374,7 +446,8 @@ namespace ResultSetCapture
         }
 
         // find that column names that are the same between the target table and the result sets table
-        private static List<string> FindMatchingColumns(DataTable resultSet, DataTable targetTable, string csvColList)
+        // filter using the @rsColumnList
+        private static List<string> FindMatchingColumns(DataTable resultSet, DataTable dtTargetTable, DataTable resultSetSchema, string csvColList)
         {
             List<string> resultSetColumnNames = new List<string>(100);
             List<string> targetTableColumnNames = new List<string>(100);
@@ -383,34 +456,68 @@ namespace ResultSetCapture
 
             // The list of columns to capture
             List<string> rsColList = new List<string>(csvColList.Split(','));
-            List<ColumnRef> CaptureColumns = new List<ColumnRef>();
+            List<ColumnRef> CaptureColumns = new List<ColumnRef>(100);
+            
+            // SQL dataTypes that use a width size
+            List<string> sizedDataTypes = new List<string>(100);
+                sizedDataTypes.Add("varchar"); 
+                sizedDataTypes.Add("nvarchar");
+                sizedDataTypes.Add("char");
+                sizedDataTypes.Add("nchar");
+                sizedDataTypes.Add("binary");
+                sizedDataTypes.Add("varbinary");
+            // SQL dataTypes that use precision and scale
+            List<string> decimalDataTypes = new List<string>(100);
+                decimalDataTypes.Add("decimal"); 
+                decimalDataTypes.Add("numeric");
+            // variables for building the SQL schema
+            string dataTypeDef;
+            string tableName;
+            string colName;
+            string precision;
+            string scale;
+            string colSize;
 
             string CaptureColumnMatch;
             string Found;
             SqlCommand sqlCmd;
-            string sqlType;
 
             // get the column names for the resultSet and check if they're in the select list
             // if the selected column list is * get all the results set columns
             // otherwise only get the ones that matched the selected list
-            foreach(DataColumn c in resultSet.Columns)
+            foreach(DataRow r in resultSetSchema.Rows)
             {
-                resultSetColumnNames.Add(c.ColumnName);   
+                tableName = r["BaseTableName"].ToString();
+                colName = r["ColumnName"].ToString().ToLower();
+                dataTypeDef = r["DataTypeName"].ToString().ToLower();
+                scale = r["NumericScale"].ToString();
+                precision = r["NumericPrecision"].ToString();
+                colSize = r["ColumnSize"].ToString();
+
+                resultSetColumnNames.Add(r["ColumnName"].ToString());
                 // if the result set column name is in the rsColList capture columns
                 // save the meta data
-                CaptureColumnMatch = rsColList.Find(m => m.ToLower() == c.ColumnName.ToLower());
+                CaptureColumnMatch = rsColList.Find(m => m.ToLower() == colName);
                 if ( (! string.IsNullOrEmpty(CaptureColumnMatch) ) || rsColList[0] == "*" )
                 {
-                    CaptureColumns.Add(new ColumnRef { columnName = c.ColumnName, DataType = c.DataType });
+                    // Build the datatype: e.g.: nvarchar(250) or decimal(10,3)
+                    if (sizedDataTypes.IndexOf(dataTypeDef) > -1)
+                        dataTypeDef += " (" + colSize + ")";
+                    else
+                    if (decimalDataTypes.IndexOf(dataTypeDef) > -1)
+                        dataTypeDef += " (" + precision + "," + scale + ")";
+                
+                    CaptureColumns.Add(new ColumnRef { columnName = colName, dataType = dataTypeDef});  
                 }
             }
 
             // get the column names for the target table
-            foreach (DataColumn col in targetTable.Columns)
+            foreach (DataColumn c in dtTargetTable.Columns) 
             {
-                targetTableColumnNames.Add(col.ColumnName);
+                colName = c.ColumnName.ToLower();
+                targetTableColumnNames.Add(colName);
             }
-            
+          
             // see if any columns are missing from the target table, based on column list
             // exec ALTER <tablename> ADD COLUMN for each missing column based on 
             foreach (ColumnRef cr in CaptureColumns)
@@ -419,35 +526,17 @@ namespace ResultSetCapture
                 Found = targetTableColumnNames.Find(m => m.ToLower() == cr.columnName.ToLower());
                 if(string.IsNullOrEmpty(Found))
                 {
-                    LogMessage("Column not in target table: " + targetTable.TableName + ". Column: " + cr.columnName + " Datatype: " + cr.DataType.Name );
-                    targetTable.Columns.Add(cr.columnName, cr.DataType);    // **** Redundant? **** maybe; might need for alternatives to SQL INSERT Statements
-                    targetTableColumnNames.Add(cr.columnName); 
-
+                    LogMessage("Column not in target table: " + resultSetSchema.TableName + ". Column: " + cr.columnName + " Datatype: " + cr.dataType, 0 );
+                    //resultSetSchema.Columns.Add(cr.columnName, cr.dataType);    // **** Redundant? **** maybe; might need for alternatives to SQL INSERT Statements
+                    targetTableColumnNames.Add(cr.columnName); // It wasn't there so add it
+                
                     using (var sqlConn = new SqlConnection(getConnectionString()))
-                    {
-                        switch(cr.DataType.Name.ToLower()) 
-                        {   case "string": 
-                                sqlType = "Varchar(100)"; 
-                                break;
-                            case "int32": 
-                                sqlType = "int" ;
-                                break;
-                            case "decimal":
-                                sqlType = "decimal(10,4)";
-                                break;
-                            case "guid":
-                                sqlType = "uniqueidentifier";
-                                break;
-                            default:
-                                sqlType = "variant";
-                                break;
-                        }
-
+                    {                        
+                        LogMessage("Column datatype: " + cr.dataType + " ColumnName: [" + cr.columnName + "] mapping to: " + cr.dataType);
                         sqlCmd = sqlConn.CreateCommand();
-                        sqlCmd.CommandText = String.Format("ALTER TABLE {0} ADD {1} {2} ",  targetTable.TableName, cr.columnName, sqlType);
+                        sqlCmd.CommandText = String.Format("ALTER TABLE {0} ADD {1} {2} ",  resultSetSchema.TableName, cr.columnName, cr.dataType);
                         sqlConn.Open();
                         sqlCmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -471,7 +560,7 @@ namespace ResultSetCapture
 
             foreach(string columnName in targetTableColumnNames)
             {
-                LogMessage("Target table [" + targetTable.TableName + "] column not in result set: " + columnName);
+                LogMessage("Target table [" + resultSetSchema.TableName + "] column not in result set: " + columnName);
             }
 
             return matchingColumnNames;
