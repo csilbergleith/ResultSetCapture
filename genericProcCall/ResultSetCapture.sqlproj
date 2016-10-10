@@ -90,6 +90,7 @@
   <ItemGroup>
     <None Include="TestScripts\CallProcFormat.xml" />
     <None Include="ResultSetCapture.publish.xml" />
+    <None Include="ResultSetCapture_1.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TestScripts\Test.sql" />

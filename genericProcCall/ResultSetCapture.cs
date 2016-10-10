@@ -40,19 +40,20 @@ public partial class StoredProcedures
        
         //*******************************************************************
 
-        // Execute & Save results to a dataSet
-        DataSet CommnandResults = CommandCallUtilities.ExecCommand(cmd);
+        // Get the SQL command Result Set
+        DataSet dsResultSetData = CommandCallUtilities.getResultSetDataSet(cmd);
 
-        DataSet dsTargetTablesOut = CommandCallUtilities.getTargetTableMetaData(cmd);
+        // Get the Meta Data for the tables that will hold the Result Sets data
+        DataSet dsTargetTablesMetaData = CommandCallUtilities.getTargetTableMetaData(cmd);
 
-        // Build a dataset with the output tables
+        // Get the schema of the Result Set tables
         DataSet dsResultSetSchema = CommandCallUtilities.getResultSetMetaData(cmd);
 
         // Use the columnList choose the columns and meta data from the result set
         // and then add any columns that are missing to the target table
 
         // Map the columns of the result set to the columns of the output table; 
-        bool result = CommandCallUtilities.mapResultsToOutputTables(CommnandResults, dsTargetTablesOut, dsResultSetSchema, cmd);
+        bool result = CommandCallUtilities.mapResultsToOutputTables(dsResultSetData, dsTargetTablesMetaData, dsResultSetSchema, cmd);
 
         return;
     }
