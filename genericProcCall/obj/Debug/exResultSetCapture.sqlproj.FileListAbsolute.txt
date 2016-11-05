@@ -1,0 +1,10 @@
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\bin\Debug\exResultSetCapture.dacpac
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\bin\Debug\SQLCommandExecute.dll
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\bin\Debug\SQLCommandExecute.pdb
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\exResultSetCapture.sqlprojResolveAssemblyReference.cache
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\Model.xml
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\refactor.xml
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\postdeploy.sql
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\predeploy.sql
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\SQLCommandExecute.dll
+C:\Users\CHARLES\Documents\Visual Studio 2013\Projects\ResultSetCapture\genericProcCall\obj\Debug\SQLCommandExecute.pdb

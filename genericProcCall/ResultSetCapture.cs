@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using Microsoft.SqlServer.Server;
-using ResultSetCapture;
+using exResultSetCapture;
 using execProcCall.Models;
 using System.Security;
 using System.Collections.Generic;
@@ -44,7 +44,7 @@ public partial class StoredProcedures
         DataSet dsResultSetData = CommandCallUtilities.getResultSetDataSet(cmd);
 
         // Get the Meta Data for the tables that will hold the Result Sets data
-        DataSet dsTargetTablesMetaData = CommandCallUtilities.getTargetTableMetaData(cmd);
+        DataSet dsCaptureTablesMetaData = CommandCallUtilities.getTargetTableMetaData(cmd);
 
         // Get the schema of the Result Set tables
         DataSet dsResultSetSchema = CommandCallUtilities.getResultSetMetaData(cmd);
@@ -52,8 +52,8 @@ public partial class StoredProcedures
         // Use the columnList choose the columns and meta data from the result set
         // and then add any columns that are missing to the target table
 
-        // Map the columns of the result set to the columns of the output table; 
-        bool result = CommandCallUtilities.mapResultsToOutputTables(dsResultSetData, dsTargetTablesMetaData, dsResultSetSchema, cmd);
+        // Map the columns of the result set to the columns of the capture table and move the data; 
+        bool result = CommandCallUtilities.mapResultsToOutputTables(dsResultSetData, dsCaptureTablesMetaData, dsResultSetSchema, cmd);
 
         return;
     }

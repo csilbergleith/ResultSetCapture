@@ -6,7 +6,7 @@ using execProcCall.Models;
 using System.Xml;
 using System;
 
-namespace ResultSetCapture
+namespace exResultSetCapture
 {
     
     internal sealed class CommandCallUtilities
@@ -30,20 +30,21 @@ namespace ResultSetCapture
                                
                 LogMessage("ExecCommand result = " + rc.ToString());
 
-                
                 conn.Close();
             }
 
             return dsResults;
         }
         
-        // Returns dataset with meta data of the target tables
+        // Get dataset with meta data of the target tables
         internal static DataSet getTargetTableMetaData(CommandCall cmd)
         {
             DataSet dsTargets = new DataSet();
             DataTable dtTarget = new DataTable();
             string queryStr;
             string connectionString = getConnectionString();
+            
+            LogMessage("Result set tables: " + cmd.rsTable.Count.ToString(), 1);
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -54,6 +55,9 @@ namespace ResultSetCapture
                     conn.Open();
 
                     queryStr = "SELECT * FROM " + tgt.tableName + " WHERE 1 = 0";
+                    
+                    LogMessage("Result set tables query: " + queryStr + "[end]", 1);
+
                     SqlDataAdapter daTgtTable = new SqlDataAdapter(queryStr, conn);
                     daTgtTable.SelectCommand.CommandType = CommandType.Text;
                     daTgtTable.Fill(dsTargets, tgt.tableName);
@@ -66,7 +70,7 @@ namespace ResultSetCapture
             return dsTargets;
         }
 
-        // Returns a DataSet with meta data of the result sets
+        // Get a DataSet with meta data of the result sets
         internal static DataSet getResultSetMetaData(CommandCall CallRequest)
         {
             DataSet dsResultSetSchema = new DataSet();
@@ -90,17 +94,17 @@ namespace ResultSetCapture
                 SqlDr = SqlCmd.ExecuteReader();
                 SqlDr.Read();
                 tblCount = 0;
-
-                // for each result table in SqlDataReader:
-                while (SqlDr.HasRows)
+                // rsTable is the list of tables that will capture the result sets
+                // for each result get the meta data, but only for the capture tables requested
+                while (SqlDr.HasRows & tblCount <  CallRequest.rsTable.Count)
                 {
-                    schemaTable = SqlDr.GetSchemaTable();
+                     schemaTable = SqlDr.GetSchemaTable();
+
+                    // each table name @rsTablex maps to the result set in sequence
+                    // and has the schema for the result set
                     schemaTable.TableName = CallRequest.rsTable[tblCount].tableName;
                     dsResultSetSchema.Tables.Add(schemaTable);
                     
-                    //dtResultSet.Load(SqlDr);
-                    //dtResultSet.TableName = "dtResult" + tblCount.ToString();
-
                     SqlDr.NextResult();
                     tblCount += 1;
                     dtResultSet.Clear();
@@ -113,7 +117,7 @@ namespace ResultSetCapture
         }
 
         // map matching column names between the results table and the target table
-        internal static bool mapResultsToOutputTables(DataSet dsResultSetData, DataSet dsTargetTablesMetaData, DataSet dsResultSetSchema, CommandCall CallRequest)
+        internal static bool mapResultsToOutputTables(DataSet dsResultSetData, DataSet dsCaptureTablesMetaData, DataSet dsResultSetSchema, CommandCall CallRequest)
         {
             // loop through result set tables; find matching columns and write out the results
             DataTable dtResultsTable = new DataTable();
@@ -125,35 +129,40 @@ namespace ResultSetCapture
             string sqlCommandText = "";
 
             int dtIdx = 0;
-            // Check how many we have of each; not enough output tables means nothing written to it
+            // Check how many result sets we have from the command 
+            // and how many capture tables were requested
             int resultTableCount = dsResultSetData.Tables.Count;
-            int targetTableCount = dsResultSetSchema.Tables.Count;
+            int captureTableCount = dsResultSetSchema.Tables.Count;
+
+            LogMessage("resultTableCount = " + resultTableCount.ToString() + "; CaptureTableCount = " + captureTableCount.ToString());
 
             // no results, we're done
             if (resultTableCount == 0) return true;
 
-            // no target tables, we're done
-            if (targetTableCount == 0) return true;
+            // no capture tables, we're done
+            if (captureTableCount == 0) return true;
 
-            // resultToTargetMap let's us map a specific result set to a target table
-            int resultToTargetMap;
+            // resultToCaptureIndex 
+            int resultToCaptureIndex;
             string tblName;
             string csvColList;
 
             // as long as we have another result set and target table, keep looping
-            while(dtIdx <= targetTableCount -1 )
+            while(dtIdx <= captureTableCount -1 )
             {
-                // get the output table name and find it in the target table list; get the resultSetSeq number
+                // get the capture table name and find it in the target table list; 
+                // get the resultSetSeq number. These will always be 1:1
+                // the first table name is the first table in the parameter list @rsTabe....
                 tblName = dsResultSetSchema.Tables[dtIdx].TableName;
 
-                resultToTargetMap = CallRequest.rsTable.Find(m => m.tableName == tblName).resultSetSeq -1;
+                resultToCaptureIndex = CallRequest.rsTable.Find(m => m.tableName == tblName).resultSetSeq -1;
 
                 csvColList = CallRequest.rsTable.Find(m => m.tableName == tblName).columnList;
 
-                // call function to get a list of the matching columns if a mapping exists
-                if(resultToTargetMap > -1)
+                // matchedColumns is a list of the requested columns and result set columns that match
+                if(resultToCaptureIndex > -1)
                 {
-                    matchedColumns = FindMatchingColumns(dsResultSetData.Tables[resultToTargetMap], dsTargetTablesMetaData.Tables[dtIdx], dsResultSetSchema.Tables[dtIdx], csvColList);
+                    matchedColumns = FindMatchingColumns(dsResultSetData.Tables[resultToCaptureIndex], dsCaptureTablesMetaData.Tables[dtIdx], dsResultSetSchema.Tables[dtIdx], csvColList);
                 }
                 else
                 {
@@ -196,7 +205,7 @@ namespace ResultSetCapture
                         string colValue;
                         byte[] ba;
 
-                        foreach (DataRow r in dsResultSetData.Tables[resultToTargetMap].Rows)
+                        foreach (DataRow r in dsResultSetData.Tables[resultToCaptureIndex].Rows)
                         {
                             // Add the VALUES clause
                             sqlValues = " VALUES ( ";
@@ -209,6 +218,8 @@ namespace ResultSetCapture
                                 mRow = DBNull.Value.Equals(r[m]);
                                 dc = r[m].GetType();
                                 
+                                // if the result set column is of type byte or boolean 
+                                // treat specially, otherwise wrap the value in N''
                                 switch (dc.Name.ToLower())
                                 {
                                     case "byte[]":
@@ -300,6 +311,8 @@ namespace ResultSetCapture
             string scale;
             string colSize;
 
+            LogMessage("FindMatchingColumns", 1);
+
             string CaptureColumnMatch;
             string Found;
             SqlCommand sqlCmd;
@@ -310,7 +323,6 @@ namespace ResultSetCapture
             foreach(DataRow r in resultSetSchema.Rows)
             {
                 tableName = r["BaseTableName"].ToString();
-                //colName = r["ColumnName"].ToString().ToLower();
                 colName = r["ColumnName"].ToString();
                 dataTypeDef = r["DataTypeName"].ToString().ToLower();
                 scale = r["NumericScale"].ToString();

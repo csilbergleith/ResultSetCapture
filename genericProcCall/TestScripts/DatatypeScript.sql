@@ -33,8 +33,12 @@ values (100, 'This is a string', newId(), 0x0f031ead0f, 1, getdate(),84727488576
 
 --select * from #dataTypeTable
 
+--EXEC exResultSetCapture 
+--      @Command='customerNameAndBalance_sp' -- select * from #dataTypeTable 
+--    , @rsTable1='#result', @rsColumnList1='*';
+
 EXEC exResultSetCapture 
-      @Command='customerNameAndBalance_sp' -- select * from #dataTypeTable 
+      @Command='exec [dbo].[customerBalanceByLastName]	@lastName=''Brown'''
     , @rsTable1='#result', @rsColumnList1='*';
 
 
