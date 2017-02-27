@@ -8,13 +8,10 @@ using System;
 
 namespace exResultSetCapture
 {
-    
     internal sealed class CommandCallUtilities
-
     {
-
         // Execute the SQL command, Return a DataSet with the result set(s)
-        internal static DataSet getResultSetDataSet(CommandCall cmd)
+        internal static DataSet getResultSetDataSet(CommandCall cmd, bool verbose )
         {
             DataSet dsResults = new DataSet();
             string connectionString = getConnectionString();
@@ -28,7 +25,7 @@ namespace exResultSetCapture
 
                 int rc = daExecCommand.Fill(dsResults);
                                
-                LogMessage("ExecCommand result = " + rc.ToString());
+                LogMessage("ExecCommand result = " + rc.ToString(), verbose);
 
                 conn.Close();
             }
@@ -37,14 +34,14 @@ namespace exResultSetCapture
         }
         
         // Get dataset with meta data of the target tables
-        internal static DataSet getTargetTableMetaData(CommandCall cmd)
+        internal static DataSet getTargetTableMetaData(CommandCall cmd, bool verbose)
         {
             DataSet dsTargets = new DataSet();
             DataTable dtTarget = new DataTable();
             string queryStr;
             string connectionString = getConnectionString();
             
-            LogMessage("Result set tables: " + cmd.rsTable.Count.ToString(), 1);
+            LogMessage("Result set tables: " + cmd.rsTable.Count.ToString(), verbose);
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -56,7 +53,7 @@ namespace exResultSetCapture
 
                     queryStr = "SELECT * FROM " + tgt.tableName + " WHERE 1 = 0";
                     
-                    LogMessage("Result set tables query: " + queryStr + "[end]", 1);
+                    LogMessage("Result set tables query: " + queryStr + "[end]", verbose);
 
                     SqlDataAdapter daTgtTable = new SqlDataAdapter(queryStr, conn);
                     daTgtTable.SelectCommand.CommandType = CommandType.Text;
@@ -71,7 +68,7 @@ namespace exResultSetCapture
         }
 
         // Get a DataSet with meta data of the result sets
-        internal static DataSet getResultSetMetaData(CommandCall CallRequest)
+        internal static DataSet getResultSetMetaData(CommandCall CallRequest, bool verbose)
         {
             DataSet dsResultSetSchema = new DataSet();
             DataTable schemaTable = new DataTable();
@@ -117,7 +114,7 @@ namespace exResultSetCapture
         }
 
         // map matching column names between the results table and the target table
-        internal static bool mapResultsToOutputTables(DataSet dsResultSetData, DataSet dsCaptureTablesMetaData, DataSet dsResultSetSchema, CommandCall CallRequest)
+        internal static bool mapResultsToOutputTables(DataSet dsResultSetData, DataSet dsCaptureTablesMetaData, DataSet dsResultSetSchema, CommandCall CallRequest, bool verbose)
         {
             // loop through result set tables; find matching columns and write out the results
             DataTable dtResultsTable = new DataTable();
@@ -134,7 +131,7 @@ namespace exResultSetCapture
             int resultTableCount = dsResultSetData.Tables.Count;
             int captureTableCount = dsResultSetSchema.Tables.Count;
 
-            LogMessage("resultTableCount = " + resultTableCount.ToString() + "; CaptureTableCount = " + captureTableCount.ToString());
+            LogMessage("resultTableCount = " + resultTableCount.ToString() + "; CaptureTableCount = " + captureTableCount.ToString(), verbose);
 
             // no results, we're done
             if (resultTableCount == 0) return true;
@@ -162,7 +159,7 @@ namespace exResultSetCapture
                 // matchedColumns is a list of the requested columns and result set columns that match
                 if(resultToCaptureIndex > -1)
                 {
-                    matchedColumns = FindMatchingColumns(dsResultSetData.Tables[resultToCaptureIndex], dsCaptureTablesMetaData.Tables[dtIdx], dsResultSetSchema.Tables[dtIdx], csvColList);
+                    matchedColumns = FindMatchingColumns(dsResultSetData.Tables[resultToCaptureIndex], dsCaptureTablesMetaData.Tables[dtIdx], dsResultSetSchema.Tables[dtIdx], csvColList, verbose);
                 }
                 else
                 {
@@ -192,7 +189,7 @@ namespace exResultSetCapture
                     // get the connection string
                     string connectionString = getConnectionString();
 
-                    LogMessage(""); // create a line break
+                    LogMessage("", verbose); // create a line break
 
                     // for each row in the result set, build the VALUES clause and execute the INSERT
                     using (SqlConnection conn = new SqlConnection(connectionString))
@@ -261,7 +258,7 @@ namespace exResultSetCapture
                             // Form the full INSERT statement
                             sqlCommandText = sqlInsert + sqlValues;
 
-                            LogMessage("Command: " + sqlInsert + sqlValues);
+                            LogMessage("Command: " + sqlInsert + sqlValues, verbose);
 
                             // Prepare command
                             tsqlWrite.CommandText = sqlCommandText;
@@ -280,7 +277,7 @@ namespace exResultSetCapture
 
         // find that column names that are the same between the target table and the result sets table
         // filter using the @rsColumnList
-        private static List<string> FindMatchingColumns(DataTable resultSet, DataTable dtTargetTable, DataTable resultSetSchema, string csvColList)
+        private static List<string> FindMatchingColumns(DataTable resultSet, DataTable dtTargetTable, DataTable resultSetSchema, string csvColList, bool verbose)
         {
             List<string> resultSetColumnNames = new List<string>(100);
             List<string> targetTableColumnNames = new List<string>(100);
@@ -311,7 +308,7 @@ namespace exResultSetCapture
             string scale;
             string colSize;
 
-            LogMessage("FindMatchingColumns", 1);
+            LogMessage("FindMatchingColumns", verbose);
 
             string CaptureColumnMatch;
             string Found;
@@ -361,13 +358,13 @@ namespace exResultSetCapture
                 Found = targetTableColumnNames.Find(m => m.ToLower() == cr.columnName.ToLower());
                 if(string.IsNullOrEmpty(Found))
                 {
-                    LogMessage("Column not in target table: " + resultSetSchema.TableName + ". Column: " + cr.columnName + " Datatype: " + cr.dataType, 0 );
+                    LogMessage("Column not in target table: " + resultSetSchema.TableName + ". Column: " + cr.columnName + " Datatype: " + cr.dataType, verbose );
                     //resultSetSchema.Columns.Add(cr.columnName, cr.dataType);    // **** Redundant? **** maybe; might need for alternatives to SQL INSERT Statements
                     targetTableColumnNames.Add(cr.columnName); // It wasn't there so add it
                 
                     using (var sqlConn = new SqlConnection(getConnectionString()))
                     {                        
-                        LogMessage("Column datatype: " + cr.dataType + " ColumnName: [" + cr.columnName + "] mapping to: " + cr.dataType);
+                        LogMessage("Column datatype: " + cr.dataType + " ColumnName: [" + cr.columnName + "] mapping to: " + cr.dataType, verbose);
                         sqlCmd = sqlConn.CreateCommand();
                         sqlCmd.CommandText = String.Format("ALTER TABLE {0} ADD {1} {2} ",  resultSetSchema.TableName, cr.columnName, cr.dataType);
                         sqlConn.Open();
@@ -391,11 +388,11 @@ namespace exResultSetCapture
                 targetTableColumnNames.Remove(columnName);
             }
 
-            LogMessage("");
+            LogMessage("", verbose);
 
             foreach(string columnName in targetTableColumnNames)
             {
-                LogMessage("Target table [" + resultSetSchema.TableName + "] column not in result set: " + columnName);
+                LogMessage("Target table [" + resultSetSchema.TableName + "] column not in result set: " + columnName, verbose);
             }
 
             return matchingColumnNames;
@@ -410,35 +407,33 @@ namespace exResultSetCapture
         // Show Help - Obsolete
         internal static void showHelp()
         {
-            LogMessage("XML Input Format", 1);
-            LogMessage("<execute schema=\"dbo\" proc=\"myProc\" >", 1);
-            LogMessage("<parm name=\"@myfirstParm\" value=\"someValue\" />", 1);
-            LogMessage("... [n] repetitions");
-            LogMessage("<parm name=\"@mylastParm\" value=\"someValue\" />", 1);
-            LogMessage("<output target=\"#Actual1\" resultsetseq=\"1\" />", 1);
-            LogMessage("... [n] repetitions", 1);
-            LogMessage("<output target=\"#ActualN\" />", 1);
-            LogMessage("</execute>", 1);
-            LogMessage("NOTE:", 1);
-            LogMessage("'resultsetseq' is optional; output target tables should be listed", 1);
-            LogMessage("in the same order as the result sets", 1);
-            LogMessage("resultsetseq' maps a specific result set to a specific table", 1);
-
-
+            LogMessage("XML Input Format", true);
+            LogMessage("<execute schema=\"dbo\" proc=\"myProc\" >", true);
+            LogMessage("<parm name=\"@myfirstParm\" value=\"someValue\" />", true);
+            LogMessage("... [n] repetitions", true);
+            LogMessage("<parm name=\"@mylastParm\" value=\"someValue\" />", true);
+            LogMessage("<output target=\"#Actual1\" resultsetseq=\"1\" />", true);
+            LogMessage("... [n] repetitions", true);
+            LogMessage("<output target=\"#ActualN\" />", true);
+            LogMessage("</execute>", true);
+            LogMessage("NOTE:", true);
+            LogMessage("'resultsetseq' is optional; output target tables should be listed", true);
+            LogMessage("in the same order as the result sets", true);
+            LogMessage("resultsetseq' maps a specific result set to a specific table", true);
         }
 
         // Centralize logic for writing messages
         // need to make this a single global objects
-        internal static void LogMessage(string msg, int force = 1)
+        internal static void LogMessage(string msg, bool verbose)
         {
-            if (force == 1)
+            if (verbose)
             {
                 SqlContext.Pipe.Send(msg);
             }
            
         }
 
-        // split the csv list of columns to capture and retur
+        // split the csv list of columns to capture and return
         internal static List<ColumnRef> GetTargetColumns (string csvColList)
         {
             string [] ColList = new string [20] ;

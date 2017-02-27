@@ -10,13 +10,28 @@ using System.Collections.Generic;
 
 public partial class StoredProcedures
 {
+    // --------------------------------------------------------
+    // Command is the sql command to execute
+    // rsTable are the predefined result set tables
+    // rsColumnList are the columns to project to the result set table
+    //      * = all columns
+    // --------------------------------------------------------
+
     [Microsoft.SqlServer.Server.SqlProcedure]
     public static void ResultSetCapture 
-       (SqlString Command, 
+       (SqlString Command,  SqlInt16 Debug,
         SqlString rsTable1, SqlString rsColumnList1, 
         SqlString rsTable2, SqlString rsColumnList2
        )
     {
+        bool Verbose = false;
+
+        if (Debug == 1)
+        {
+            Verbose = true;
+        }
+         
+
         // Storage for the parameters: 
         CommandCall cmd = new CommandCall();
 
@@ -41,19 +56,19 @@ public partial class StoredProcedures
         //*******************************************************************
 
         // Get the SQL command Result Set
-        DataSet dsResultSetData = CommandCallUtilities.getResultSetDataSet(cmd);
+        DataSet dsResultSetData = CommandCallUtilities.getResultSetDataSet(cmd, Verbose);
 
         // Get the Meta Data for the tables that will hold the Result Sets data
-        DataSet dsCaptureTablesMetaData = CommandCallUtilities.getTargetTableMetaData(cmd);
+        DataSet dsCaptureTablesMetaData = CommandCallUtilities.getTargetTableMetaData(cmd, Verbose);
 
         // Get the schema of the Result Set tables
-        DataSet dsResultSetSchema = CommandCallUtilities.getResultSetMetaData(cmd);
+        DataSet dsResultSetSchema = CommandCallUtilities.getResultSetMetaData(cmd, Verbose);
 
         // Use the columnList choose the columns and meta data from the result set
         // and then add any columns that are missing to the target table
 
         // Map the columns of the result set to the columns of the capture table and move the data; 
-        bool result = CommandCallUtilities.mapResultsToOutputTables(dsResultSetData, dsCaptureTablesMetaData, dsResultSetSchema, cmd);
+        bool result = CommandCallUtilities.mapResultsToOutputTables(dsResultSetData, dsCaptureTablesMetaData, dsResultSetSchema, cmd, Verbose);
 
         return;
     }
