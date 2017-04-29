@@ -1,8 +1,13 @@
 ﻿
-if object_id('tempdb..#result') is not null
-    drop table #result;
+if object_id('tempdb..#details') is not null
+    drop table #details;
 
-CREATE  table #result (id int identity);
+CREATE  table #details (id int identity);
+
+if object_id('tempdb..#summary') is not null
+    drop table #summary;
+
+CREATE table #summary(id int identity);
 
 if object_id('tempdb..#dataTypeTable') is not null
     drop table #dataTypeTable;
@@ -33,9 +38,18 @@ values (100, 'This is a string', newId(), 0x0f031ead0f, 1, getdate(),84727488576
 
 --select * from #dataTypeTable
 
+--EXEC exResultSetCapture 
+--      @Command='customerNameAndBalance_sp' -- select * from #dataTypeTable 
+--    , @rsTable1='#details', @rsColumnList1='*';
+
 EXEC exResultSetCapture 
-      @Command='customerNameAndBalance_sp' -- select * from #dataTypeTable 
-    , @rsTable1='#result', @rsColumnList1='*';
+      @Command='exec [dbo].[customerBalanceByLastName]	@lastName=''Brown'''
+    , @rsTable1='#details', @rsColumnList1='*';
+
+--EXEC exResultSetCapture 
+--      @Command='exec [dbo].[customerBalanceByLastName]	@lastName=''Brown'''
+--    , @rsTable1='#details', @rsColumnList1='*'
+--	  , @rsTable2='#summary', @rsColumnList2='*';
 
 
 --drop table tTbl
@@ -43,3 +57,5 @@ EXEC exResultSetCapture
 select * 
 --into tTbl 
 from #result;
+
+select * from #summary;
