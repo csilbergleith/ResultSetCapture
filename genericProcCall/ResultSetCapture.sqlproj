@@ -8,7 +8,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{60595030-7583-41ca-a6d6-963f3c5cedab}</ProjectGuid>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql110DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql120DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
@@ -92,6 +92,7 @@
     <None Include="TestScripts\CallProcFormat.xml" />
     <None Include="ResultSetCapture.publish.xml" />
     <None Include="ResultSetCapture_1.publish.xml" />
+    <None Include="ResultSetCapture2013.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TestScripts\Test.sql" />
