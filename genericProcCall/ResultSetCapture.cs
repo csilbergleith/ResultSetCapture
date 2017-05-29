@@ -10,27 +10,20 @@ using System.Collections.Generic;
 
 public partial class StoredProcedures
 {
-    // --------------------------------------------------------
-    // Command is the sql command to execute
-    // rsTable are the predefined result set tables
-    // rsColumnList are the columns to project to the result set table
-    //      * = all columns
-    // --------------------------------------------------------
-
     [Microsoft.SqlServer.Server.SqlProcedure]
     public static void ResultSetCapture 
-       (SqlString Command,  SqlInt16 Debug,
+       (SqlString Command, SqlInt16 Debug,
         SqlString rsTable1, SqlString rsColumnList1, 
         SqlString rsTable2, SqlString rsColumnList2
        )
     {
+
         bool Verbose = false;
 
         if (Debug == 1)
         {
             Verbose = true;
         }
-         
 
         // Storage for the parameters: 
         CommandCall cmd = new CommandCall();

@@ -8,10 +8,13 @@ using System;
 
 namespace exResultSetCapture
 {
+    
     internal sealed class CommandCallUtilities
+
     {
+
         // Execute the SQL command, Return a DataSet with the result set(s)
-        internal static DataSet getResultSetDataSet(CommandCall cmd, bool verbose )
+        internal static DataSet getResultSetDataSet(CommandCall cmd, bool verbose)
         {
             DataSet dsResults = new DataSet();
             string connectionString = getConnectionString();
@@ -79,7 +82,7 @@ namespace exResultSetCapture
             SqlDataReader SqlDr;
             SqlCommand SqlCmd;
 
-            int brkCount;
+            //int brkCount;
             int tblCount = 0;
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -234,6 +237,10 @@ namespace exResultSetCapture
                                             colValue = "0,";
                                         }
                                         break;
+                                    case "datetime":
+                                        DateTime dateValue = Convert.ToDateTime(r[m]);
+                                        colValue = "N'" + dateValue.ToString("MM/dd/yyyy hh:mm:ss.fff tt") + "',";
+                                        break;
                                     default:
                                         colValue = "N'" + r[m].ToString().Replace("'","''") + "', ";
                                         break;
@@ -308,7 +315,7 @@ namespace exResultSetCapture
             string scale;
             string colSize;
 
-            LogMessage("FindMatchingColumns", verbose);
+            LogMessage("FindMatchingColumns",verbose);
 
             string CaptureColumnMatch;
             string Found;
@@ -358,7 +365,7 @@ namespace exResultSetCapture
                 Found = targetTableColumnNames.Find(m => m.ToLower() == cr.columnName.ToLower());
                 if(string.IsNullOrEmpty(Found))
                 {
-                    LogMessage("Column not in target table: " + resultSetSchema.TableName + ". Column: " + cr.columnName + " Datatype: " + cr.dataType, verbose );
+                    LogMessage("Column not in target table: " + resultSetSchema.TableName + ". Column: " + cr.columnName + " Datatype: " + cr.dataType, verbose);
                     //resultSetSchema.Columns.Add(cr.columnName, cr.dataType);    // **** Redundant? **** maybe; might need for alternatives to SQL INSERT Statements
                     targetTableColumnNames.Add(cr.columnName); // It wasn't there so add it
                 
@@ -405,22 +412,24 @@ namespace exResultSetCapture
         }
 
         // Show Help - Obsolete
-        internal static void showHelp()
-        {
-            LogMessage("XML Input Format", true);
-            LogMessage("<execute schema=\"dbo\" proc=\"myProc\" >", true);
-            LogMessage("<parm name=\"@myfirstParm\" value=\"someValue\" />", true);
-            LogMessage("... [n] repetitions", true);
-            LogMessage("<parm name=\"@mylastParm\" value=\"someValue\" />", true);
-            LogMessage("<output target=\"#Actual1\" resultsetseq=\"1\" />", true);
-            LogMessage("... [n] repetitions", true);
-            LogMessage("<output target=\"#ActualN\" />", true);
-            LogMessage("</execute>", true);
-            LogMessage("NOTE:", true);
-            LogMessage("'resultsetseq' is optional; output target tables should be listed", true);
-            LogMessage("in the same order as the result sets", true);
-            LogMessage("resultsetseq' maps a specific result set to a specific table", true);
-        }
+        //internal static void showHelp()
+        //{
+        //    LogMessage("XML Input Format", 1);
+        //    LogMessage("<execute schema=\"dbo\" proc=\"myProc\" >", 1);
+        //    LogMessage("<parm name=\"@myfirstParm\" value=\"someValue\" />", 1);
+        //    LogMessage("... [n] repetitions");
+        //    LogMessage("<parm name=\"@mylastParm\" value=\"someValue\" />", 1);
+        //    LogMessage("<output target=\"#Actual1\" resultsetseq=\"1\" />", 1);
+        //    LogMessage("... [n] repetitions", 1);
+        //    LogMessage("<output target=\"#ActualN\" />", 1);
+        //    LogMessage("</execute>", 1);
+        //    LogMessage("NOTE:", 1);
+        //    LogMessage("'resultsetseq' is optional; output target tables should be listed", 1);
+        //    LogMessage("in the same order as the result sets", 1);
+        //    LogMessage("resultsetseq' maps a specific result set to a specific table", 1);
+
+
+        //}
 
         // Centralize logic for writing messages
         // need to make this a single global objects
@@ -433,7 +442,7 @@ namespace exResultSetCapture
            
         }
 
-        // split the csv list of columns to capture and return
+        // split the csv list of columns to capture and retur
         internal static List<ColumnRef> GetTargetColumns (string csvColList)
         {
             string [] ColList = new string [20] ;

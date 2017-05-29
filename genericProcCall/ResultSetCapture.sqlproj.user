@@ -3,8 +3,8 @@
   <PropertyGroup>
     <StartupScript>TestScripts\DatatypeScript.sql</StartupScript>
     <StartAction>StartScript</StartAction>
-    <TargetConnectionString>Data Source=GROUCHO;Initial Catalog=sandbox;Integrated Security=True;Pooling=False</TargetConnectionString>
-    <TargetDatabase>sandbox</TargetDatabase>
+    <TargetConnectionString>Data Source=GROUCHO\SQL2016;Initial Catalog=ResultSetCapture;Integrated Security=True;Pooling=False</TargetConnectionString>
+    <TargetDatabase>ResultSetCapture</TargetDatabase>
     <StartupScriptList>TestScripts\DatatypeScript.sql/TestScripts\Test.sql/TestScripts\DatatypeScript.sql</StartupScriptList>
   </PropertyGroup>
 </Project>
