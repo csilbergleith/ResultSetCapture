@@ -1,0 +1,5 @@
+1) install tSQLt
+2) Deploy assembly
+3) Deploy dependent objects (3 tables, 1 proc, 1 Test Class)
+4) compile Test Cases
+5) run test cases
